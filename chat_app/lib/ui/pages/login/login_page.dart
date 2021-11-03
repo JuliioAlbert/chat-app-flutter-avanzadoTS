@@ -1,8 +1,11 @@
+import 'package:chat_app/domain/bloc/auth_bloc/auth_bloc.dart';
 import 'package:chat_app/ui/widgets/btn_rojo.dart';
 import 'package:chat_app/ui/widgets/custom_input.dart';
 import 'package:chat_app/ui/widgets/logo.dart';
+import 'package:chat_app/ui/widgets/mostrar_alerta.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'widgets/labels_login.dart';
 
@@ -75,11 +78,27 @@ class _FormularioState extends State<Formulario> {
             placeholder: 'Password',
             keyboardType: TextInputType.text,
           ),
-          ButtonRojo(
-            label: "Ingresar",
-            onPressed: () {
-              print(emailCtrl.text);
-              print(pswCtrl.text);
+          BlocBuilder<AuthBloc, AuthState>(
+            builder: (context, state) {
+              return ButtonRojo(
+                label: "Ingresar",
+                onPressed: state.autenticando
+                    ? null
+                    : () {
+                        FocusScope.of(context)
+                            .unfocus(); // Quitar el foco de atencion
+
+                        BlocProvider.of<AuthBloc>(context)
+                            .add(Login(emailCtrl.text, pswCtrl.text));
+                        if (state.autenticado && state.autenticando == false) {
+                          //TODO:"Conectar SOCKET"
+                          Navigator.pushReplacementNamed(context, 'usuarios');
+                        } else {
+                          MostrarAlerta.mostrarAlerta(context, 'Login error',
+                              "Revise sus credenciales");
+                        }
+                      },
+              );
             },
           )
         ],

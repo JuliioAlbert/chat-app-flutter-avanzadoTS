@@ -34,7 +34,7 @@ class _MessageUIState extends State<MessageUI> with TickerProviderStateMixin {
       child: SizeTransition(
         sizeFactor: CurvedAnimation(
           parent: controller,
-          curve: Curves.easeInOut,
+          curve: Curves.easeIn,
         ),
         child: MessageItem(chat: widget.chat),
       ),

@@ -1,9 +1,13 @@
+import 'package:chat_app/domain/bloc/auth_bloc/auth_bloc.dart';
 import 'package:chat_app/domain/entities/usuario.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class UsuariosPage extends StatefulWidget {
+  const UsuariosPage({Key? key}) : super(key: key);
+
   @override
   State<UsuariosPage> createState() => _UsuariosPageState();
 }
@@ -14,13 +18,23 @@ class _UsuariosPageState extends State<UsuariosPage> {
 
   @override
   Widget build(BuildContext context) {
+    final usuario = context.read<AuthBloc>().usuario;
+
     return Scaffold(
         appBar: AppBar(
-          title: Text('Mi nombre'),
-          leading: IconButton(onPressed: () {}, icon: Icon(Icons.exit_to_app)),
+          centerTitle: true,
+          title: Text(usuario?.nombre.toUpperCase() ?? "Sin nombre"),
+          leading: IconButton(
+            onPressed: () {
+              context.read<AuthBloc>().add(Loggout());
+              Navigator.pushReplacementNamed(context, 'login');
+              //Disconnect
+            },
+            icon: const Icon(Icons.exit_to_app),
+          ),
           actions: [
             CupertinoButton(
-                child: Icon(Icons.online_prediction), onPressed: () {})
+                child: const Icon(Icons.online_prediction), onPressed: () {})
           ],
         ),
         body: SmartRefresher(
@@ -45,14 +59,23 @@ class _UsuariosPageState extends State<UsuariosPage> {
 class ListUsuarios extends StatelessWidget {
   final usuarios = [
     Usuario(
-        uuid: '1', nombre: "julio", email: "correo@correo.com", online: true),
+      uid: '1',
+      nombre: "julio",
+      email: "correo@correo.com",
+      online: true,
+    ),
     Usuario(
-        uuid: '2', nombre: "Diego", email: "correo2@correo.com", online: true),
+      uid: '2',
+      nombre: "Diego",
+      email: "correo2@correo.com",
+      online: true,
+    ),
     Usuario(
-        uuid: '3',
-        nombre: "Fernando",
-        email: "correo1@correo.com",
-        online: false),
+      uid: '3',
+      nombre: "Fernando",
+      email: "correo1@correo.com",
+      online: false,
+    ),
   ];
 
   @override
@@ -80,17 +103,17 @@ class UsuarioAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       onTap: () {},
-      title: Text(usuario.nombre!),
+      title: Text(usuario.nombre),
       leading: CircleAvatar(
         //backgroundColor: Colors.grey[600],
-        child: Text(usuario.nombre!.substring(0, 2)),
+        child: Text(usuario.nombre.substring(0, 2)),
       ),
-      subtitle: Text(usuario.email!),
+      subtitle: Text(usuario.email),
       trailing: Container(
         width: 10,
         height: 10,
         decoration: BoxDecoration(
-          color: usuario.online! ? Colors.red : Colors.red,
+          color: usuario.online ? Colors.red : Colors.red,
           borderRadius: BorderRadius.circular(100),
         ),
       ),
